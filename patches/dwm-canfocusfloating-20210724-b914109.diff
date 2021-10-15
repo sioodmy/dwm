@@ -1,0 +1,145 @@
+From b9141091994ba657af534453ab913663a8258f9a Mon Sep 17 00:00:00 2001
+From: oxinosg <georgios.oxinos.extern@elinvar.de>
+Date: Sat, 24 Jul 2021 23:31:30 +0200
+Subject: [PATCH] [dwm][cantogglefloating] patch that allows disabling focus on
+ floating clients
+
+---
+ config.def.h |  1 +
+ dwm.c        | 67 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 63 insertions(+), 5 deletions(-)
+
+diff --git a/config.def.h b/config.def.h
+index 1c0b587..005fb5d 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -70,6 +70,7 @@ static Key keys[] = {
+ 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
+ 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
+ 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
++  { MODKEY,                       XK_s,      togglecanfocusfloating,   {0} },
+ 	{ MODKEY,                       XK_Return, zoom,           {0} },
+ 	{ MODKEY,                       XK_Tab,    view,           {0} },
+ 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
+diff --git a/dwm.c b/dwm.c
+index 4465af1..ae0a0ea 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -92,7 +92,7 @@ struct Client {
+ 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
+ 	int bw, oldbw;
+ 	unsigned int tags;
+-	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
++	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, cantfocus;
+ 	Client *next;
+ 	Client *snext;
+ 	Monitor *mon;
+@@ -191,6 +191,7 @@ static Monitor *recttomon(int x, int y, int w, int h);
+ static void resize(Client *c, int x, int y, int w, int h, int interact);
+ static void resizeclient(Client *c, int x, int y, int w, int h);
+ static void resizemouse(const Arg *arg);
++static void resetcanfocusfloating();
+ static void restack(Monitor *m);
+ static void run(void);
+ static void scan(void);
+@@ -211,6 +212,7 @@ static void tagmon(const Arg *arg);
+ static void tile(Monitor *);
+ static void togglebar(const Arg *arg);
+ static void togglefloating(const Arg *arg);
++static void togglecanfocusfloating(const Arg *arg);
+ static void toggletag(const Arg *arg);
+ static void toggleview(const Arg *arg);
+ static void unfocus(Client *c, int setfocus);
+@@ -788,6 +790,8 @@ focus(Client *c)
+ 	if (selmon->sel && selmon->sel != c)
+ 		unfocus(selmon->sel, 0);
+ 	if (c) {
++		if (c->cantfocus)
++			return;
+ 		if (c->mon != selmon)
+ 			selmon = c->mon;
+ 		if (c->isurgent)
+@@ -837,16 +841,16 @@ focusstack(const Arg *arg)
+ 	if (!selmon->sel)
+ 		return;
+ 	if (arg->i > 0) {
+-		for (c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
++		for (c = selmon->sel->next; c && (!ISVISIBLE(c) || c->cantfocus); c = c->next);
+ 		if (!c)
+-			for (c = selmon->clients; c && !ISVISIBLE(c); c = c->next);
++			for (c = selmon->clients; c && (!ISVISIBLE(c) || c->cantfocus); c = c->next);
+ 	} else {
+ 		for (i = selmon->clients; i != selmon->sel; i = i->next)
+-			if (ISVISIBLE(i))
++      if (ISVISIBLE(i) && !i->cantfocus)
+ 				c = i;
+ 		if (!c)
+ 			for (; i; i = i->next)
+-				if (ISVISIBLE(i))
++        if (ISVISIBLE(i) && !i->cantfocus)
+ 					c = i;
+ 	}
+ 	if (c) {
+@@ -1716,6 +1720,59 @@ togglefloating(const Arg *arg)
+ 	if (selmon->sel->isfloating)
+ 		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
+ 			selmon->sel->w, selmon->sel->h, 0);
++
++  resetcanfocusfloating();
++
++	arrange(selmon);
++}
++
++void
++resetcanfocusfloating()
++{
++	unsigned int i, n;
++	Client *c;
++
++	for (n = 0, c = selmon->clients; c; c = c->next, n++);
++	if (n == 0)
++		return;
++
++	for (i = 0, c = selmon->clients; c; c = c->next, i++)
++    if (c->isfloating)
++      c->cantfocus = 0;
++
++	arrange(selmon);
++}
++
++void
++togglecanfocusfloating(const Arg *arg)
++{
++	unsigned int n;
++	Client *c, *cf = NULL;
++
++  if (!selmon->sel)
++      return;
++
++  for (c = selmon->clients; c; c = c->next)
++      if (c->cantfocus == 1) {
++          cf = c;
++      }
++
++  if (cf) {
++      resetcanfocusfloating();
++      focus(cf);
++  } else {
++    for (n = 0, c = selmon->clients; c; c = c->next)
++        if (c->isfloating)
++            c->cantfocus = !c->cantfocus;
++        else
++            n++;
++
++    if (n && selmon->sel->isfloating) {
++        c = nexttiled(selmon->clients);
++        focus(c);
++    }
++  }
++
+ 	arrange(selmon);
+ }
+ 
+-- 
+2.27.0
+
