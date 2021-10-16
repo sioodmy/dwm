@@ -1,0 +1,43 @@
+diff --git a/config.def.h b/config.def.h
+index 7365cb5..afd79a0 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -7,6 +7,8 @@ static const unsigned int gappx     = 10;       /* default gap between windows i
+ static const unsigned int snap      = 32;       /* snap pixel */
+ static const int showbar            = 1;        /* 0 means no bar */
+ static const int topbar             = 1;        /* 0 means bottom bar */
++static const int horizpadbar        = 2;        /* horizontal padding for statusbar */
++static const int vertpadbar         = 0;        /* vertical padding for statusbar */
+ static const char *fonts[]          = { "monospace:size=10" };
+ static const char dmenufont[]       = "monospace:size=10";
+ static const char col_gray1[]       = "#222222";
+diff --git a/dwm.c b/dwm.c
+index 892c306..ddbba66 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -740,14 +740,14 @@ drawstatusbar(Monitor *m, int bh, char* stext) {
+ 		isCode = 0;
+ 	text = p;
+ 
+-	w += 2; /* 1px padding on both sides */
++	w += horizpadbar;
+ 	ret = x = m->ww - w;
+ 
+ 	drw_setscheme(drw, scheme[LENGTH(colors)]);
+ 	drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
+ 	drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
+ 	drw_rect(drw, x, 0, w, bh, 1, 1);
+-	x++;
++	x += horizpadbar / 2;
+ 
+ 	/* process status text */
+ 	i = -1;
+@@ -1699,7 +1699,7 @@ setup(void)
+ 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
+ 		die("no fonts could be loaded.");
+ 	lrpad = drw->fonts->h;
+-	bh = drw->fonts->h + 2;
++	bh = drw->fonts->h + vertpadbar;
+ 	updategeom();
+ 	/* init atoms */
+ 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
