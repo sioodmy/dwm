@@ -34,12 +34,19 @@ static const char *tags[] = {" ", " ", " ", " ", " "};
 static const char *tagsel[][2][2] = {
 		/*      norm                          sel       */
 			/*  fg          bg              fg          bg  */
-		{ { "#a3be8c", col_gray1 }, { "#ffffff", col_gray1 } },
-		{ { "#5e81ac", col_gray1 }, { "#ffffff", col_gray1 } },
-		{ { "#ebcb8b", col_gray1 }, { "#000000", col_gray1 } },
-		{ { "#bf616a", col_gray1 }, { "#000000", col_gray1 } },
-		{ { "#d08770", col_gray1 }, { "#ffffff", col_gray1 } },
+		{ { "#a3be8c", col_gray1 }, { "#a3be8c", col_gray1 } },
+		{ { "#5e81ac", col_gray1 }, { "#5e81ac", col_gray1 } },
+		{ { "#ebcb8b", col_gray1 }, { "#ebcb8b", col_gray1 } },
+		{ { "#bf616a", col_gray1 }, { "#bf616a", col_gray1 } },
+		{ { "#d08770", col_gray1 }, { "#d08770", col_gray1 } },
 	};
+
+
+static const unsigned int ulinepad	= 5;	/* horizontal padding between the underline and tag */
+static const unsigned int ulinestroke	= 2;	/* thickness / height of the underline */
+static const unsigned int ulinevoffset	= 0;	/* how far above the bottom of the bar the line should appear */
+static const int ulineall 		= 0;	/* 1 to show underline on all tags, 0 for just the active ones */
+
 static const Rule rules[] = { /* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
