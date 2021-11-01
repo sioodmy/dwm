@@ -29,10 +29,18 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const char *tags[] = {" ", " ", " ", " ", " "};
 
-static const Rule rules[] = {
-	/* xprop(1):
+static const char *tagsel[][2][2] = {
+		/*      norm                          sel       */
+			/*  fg          bg              fg          bg  */
+		{ { "#a3be8c", col_gray1 }, { "#ffffff", col_gray1 } },
+		{ { "#5e81ac", col_gray1 }, { "#ffffff", col_gray1 } },
+		{ { "#ebcb8b", col_gray1 }, { "#000000", col_gray1 } },
+		{ { "#bf616a", col_gray1 }, { "#000000", col_gray1 } },
+		{ { "#d08770", col_gray1 }, { "#ffffff", col_gray1 } },
+	};
+static const Rule rules[] = { /* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
