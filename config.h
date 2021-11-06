@@ -31,7 +31,7 @@ static const char *colors[][3]      = {
 /* tagging */
 static const char *tags[] = {" ", " ", " ", " ", " "};
 static const char *tagsalt[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-static const int momentaryalttags = 0; /* 1 means alttags will show only when key is held down*/
+static const int momentaryalttags = 1; /* 1 means alttags will show only when key is held down*/
 static const char *tagsel[][2][2] = {
 		/*      norm                          sel       */
 			/*  fg          bg              fg          bg  */
@@ -67,7 +67,6 @@ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen win
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
 #include "vanitygaps.c"
-
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[\\]",     dwindle },
@@ -127,6 +126,7 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
 
+#include "shiftview.c"
 void
 setlayoutex(const Arg *arg)
 {
@@ -169,6 +169,20 @@ tagall(const Arg *arg)
 	tag(&((Arg){.ui = ~0}));
 }
 
+void
+nexttag(const Arg *arg)
+{
+	shiftviewclients(&((Arg){.i = +1}));
+
+}
+
+
+void
+prevtag(const Arg *arg)
+{
+	shiftviewclients(&((Arg){.i = -1}));
+
+}
 /* signal definitions */
 /* signum must be greater than 0 */
 /* trigger signals using `xsetroot -name "fsignal:<signame> [<type> <value>]"` */
@@ -182,6 +196,8 @@ static Signal signals[] = {
 	{ "focusmon",       focusmon },
 	{ "tagmon",         tagmon },
 	{ "zoom",           zoom },
+	{ "nexttag",	    nexttag },
+	{ "prevtag",		prevtag },
 	{ "view",           view },
 	{ "viewall",        viewall },
 	{ "viewex",         viewex },
