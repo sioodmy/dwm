@@ -30,7 +30,8 @@ static const char *colors[][3]      = {
 
 /* tagging */
 static const char *tags[] = {" ", " ", " ", " ", " "};
-
+static const char *tagsalt[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+static const int momentaryalttags = 0; /* 1 means alttags will show only when key is held down*/
 static const char *tagsel[][2][2] = {
 		/*      norm                          sel       */
 			/*  fg          bg              fg          bg  */
@@ -104,6 +105,7 @@ static const char *termcmd[]  = { "st", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
+
 	NULL
 };
 
@@ -189,6 +191,7 @@ static Signal signals[] = {
 	{ "tagall",         tagall },
 	{ "tagex",          tagex },
 	{ "toggletag",      tag },
+	{ "togglealttag",   togglealttag },
 	{ "toggletagex",    toggletagex },
 	{ "killclient",     killclient },
 	{ "quit",           quit },
