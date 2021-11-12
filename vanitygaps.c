@@ -12,6 +12,7 @@ static void togglegaps(const Arg *arg);
 static void bstack(Monitor *m);
 static void bstackhoriz(Monitor *m);
 static void centeredmaster(Monitor *m);
+static void zen(Monitor *m);
 static void centeredfloatingmaster(Monitor *m);
 static void deck(Monitor *m);
 static void dwindle(Monitor *m);
@@ -161,6 +162,7 @@ getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 	*iv = m->gappiv*ie; // inner vertical gap
 	*nc = n;            // number of clients
 }
+
 
 void
 getfacts(Monitor *m, int msize, int ssize, float *mf, float *sf, int *mr, int *sr)
@@ -366,6 +368,10 @@ centeredmaster(Monitor *m)
 	}
 }
 
+
+
+
+
 void
 centeredfloatingmaster(Monitor *m)
 {
@@ -423,6 +429,30 @@ centeredfloatingmaster(Monitor *m)
  * Deck layout + gaps
  * https://dwm.suckless.org/patches/deck/
  */
+
+void
+zen(Monitor *m)
+{
+	unsigned int i, n;
+	int oh, ov, ih, iv;
+	int mx = 0, my = 0, mh = 0, mw = 0;
+	int sx = 0, sy = 0, sh = 0, sw = 0;
+
+	getgaps(m, &oh, &ov, &ih, &iv, &n);
+	Client *c;
+	ov = gapzen;
+	oh = gappoh * 4;
+	sx = mx = m->wx + ov;
+	sy = my = m->wy + oh;
+	sh = mh = m->wh - 2*oh - ih * (MIN(n, m->nmaster) - 1);
+	sw = mw = m->ww - 2*ov;
+
+	for (c = m->clients; c; c = c->next)
+		if (ISVISIBLE(c))
+			n++;
+	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
+			resize(c, sx, sy, sw - (2*c->bw), sh - (2*c->bw), 0);
+}
 void
 deck(Monitor *m)
 {
