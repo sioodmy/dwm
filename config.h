@@ -7,6 +7,7 @@ static const unsigned int gappih    = 12;       /* horiz inner gap between windo
 static const unsigned int gappiv    = 12;       /* vert inner gap between windows */
 static const unsigned int gappoh    = 12;       /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov    = 12;       /* vert outer gap between windows and screen edge */
+static const unsigned int gapzen    = 500;
 static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
@@ -69,20 +70,10 @@ static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen win
 #include "vanitygaps.c"
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[\\]",     dwindle },
-	{ "|M|",      centeredmaster },
-	{ "[]=",      tile },    /* first entry is default */
-	{ "[M]",      monocle },
-	{ "[@]",      spiral },
-	{ "H[]",      deck },
-	{ "TTT",      bstack },
-	{ "===",      bstackhoriz },
-	{ "HHH",      grid },
-	{ "###",      nrowgrid },
-	{ "---",      horizgrid },
-	{ ":::",      gaplessgrid },
-	{ ">M>",      centeredfloatingmaster },
-	{ "><>",      NULL },    /* no layout function means floating behavior */
+	{ "  ",     dwindle },
+	{ "ﲠ  ",      centeredmaster },
+	{ "  ",      zen },
+	{ "缾 ",      NULL },    /* no layout function means floating behavior */
 	{ NULL,       NULL },
 };
 
@@ -193,6 +184,7 @@ static Signal signals[] = {
 	{ "togglebar",      togglebar },
 	{ "incnmaster",     incnmaster },
 	{ "togglefloating", togglefloating },
+	{ "fullscreen",     fullscreen },
 	{ "focusmon",       focusmon },
 	{ "tagmon",         tagmon },
 	{ "zoom",           zoom },
