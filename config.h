@@ -1,6 +1,14 @@
-/* See LICENSE file for copyright and license details. */
+/*  
+     _                                       __ _
+  __| |_      ___ __ ___     ___ ___  _ __  / _(_) __ _
+ / _` \ \ /\ / / '_ ` _ \   / __/ _ \| '_ \| |_| |/ _` |
+| (_| |\ V  V /| | | | | | | (_| (_) | | | |  _| | (_| |
+ \__,_| \_/\_/ |_| |_| |_|  \___\___/|_| |_|_| |_|\__, |
+                                                  |___/
+*/
 
-/* appearance */
+
+
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappih    = 12;       /* horiz inner gap between windows */
@@ -15,18 +23,16 @@ static const int vertpad            = 10;       /* vertical padding of bar */
 static const int sidepad            = 12;       /* horizontal padding of bar */
 static const int user_bh            = 32;        /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
 static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=12" };
-static const char dmenufont[]       = "JetBrainsMono Nerd Font:size=12";
-static const char col_gray1[]       = "#3b4252"; //status background color
-static const char col_gray2[]       = "#2e3440"; //inactive window border color
-static const char col_gray3[]       = "#d8dee9"; //font color 
-static const char col_gray4[]       = "#eeeeee"; //current tag und current window font color
-static const char col_cyan[]        = "#4c566a"; //top bar
-static const char col_urgborder[]   = "#bf616a"; //urgent border
+static const char nord1[]       = "#3b4252"; //status background color
+static const char nord0[]       = "#2e3440"; //inactive window border color
+static const char nord4[]       = "#d8dee9"; //font color 
+static const char nord6[]       = "#eceff4"; //current tag und current window font color
+static const char nord10[]        = "#4c566a"; //top bar
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
-	[SchemeHid]  = { col_cyan,  col_gray1, col_cyan  },
+	[SchemeNorm] = { nord4, nord1, nord0 },
+	[SchemeSel]  = { nord6, nord10,  nord10  },
+	[SchemeHid]  = { nord10,  nord1, nord10  },
 };
 
 /* tagging */
@@ -36,11 +42,11 @@ static const int momentaryalttags = 1; /* 1 means alttags will show only when ke
 static const char *tagsel[][2][2] = {
 		/*      norm                          sel       */
 			/*  fg          bg              fg          bg  */
-		{ { "#a3be8c", col_gray1 }, { "#a3be8c", col_gray1 } },
-		{ { "#5e81ac", col_gray1 }, { "#5e81ac", col_gray1 } },
-		{ { "#ebcb8b", col_gray1 }, { "#ebcb8b", col_gray1 } },
-		{ { "#bf616a", col_gray1 }, { "#bf616a", col_gray1 } },
-		{ { "#d08770", col_gray1 }, { "#d08770", col_gray1 } },
+		{ { "#a3be8c", nord1 }, { "#a3be8c", nord1 } },
+		{ { "#5e81ac", nord1 }, { "#5e81ac", nord1 } },
+		{ { "#ebcb8b", nord1 }, { "#ebcb8b", nord1 } },
+		{ { "#bf616a", nord1 }, { "#bf616a", nord1 } },
+		{ { "#d08770", nord1 }, { "#d08770", nord1 } },
 	};
 
 
@@ -85,19 +91,6 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
-/* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-
-/* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "st", NULL };
-
-static Key keys[] = {
-	/* modifier                     key        function        argument */
-
-	NULL
-};
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
@@ -107,7 +100,6 @@ static Button buttons[] = {
 	{ ClkLtSymbol,          0,              Button3,        cyclelayout,    {.i = -1  }},
 	{ ClkWinTitle,          0,              Button1,        togglewin,      {0} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
-	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
