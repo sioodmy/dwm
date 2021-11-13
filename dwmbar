@@ -1,0 +1,42 @@
+#!/bin/sh
+
+function music () {
+	current=$(mpc current) && \
+		[[ current = "" ]] || \
+		mpc status | grep playing > /dev/null && printf "^c#bf616a^ $current" || printf "^c#bf616a^ $current"
+}
+
+function volume () {
+	echo -n "^c#d08770^墳$(mpc volume | sed 's:.*\:::')"
+}
+function clock () {
+	printf "^c#81a1c1^ $(date +%d.%m.%y) ^c#5e81ac^ $(date +%H:%M)"
+	
+}
+
+function ram () {
+	printf "^c#a3be8c^  $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
+}
+
+function cpu () {
+	printf "^c#ebcb8b^  $(grep -o "^[^ ]*" /proc/loadavg)"
+}
+
+
+
+function update () {
+	[ -f /usr/bin/mpc ] && xsetroot -name " $(cpu) $(ram) $(volume) $(music) $(clock) " \
+		|| xsetroot -name " $(cpu) $(ram) $(volume) $(clock) " 
+
+}
+
+export -f update
+
+
+while true; do
+	sleep 1 && update
+done &
+
+while true; do
+	mpc idle && update
+done &
