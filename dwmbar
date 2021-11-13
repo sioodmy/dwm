@@ -1,37 +1,38 @@
-#!/bin/sh
+#!/bin/bash
 
-function music () {
+music () {
+	
+	volume=$(mpc volume | sed 's:.*\:::') || exit
+	echo $volume | grep n/a > /dev/null && exit
+
 	current=$(mpc current) && \
-		[[ current = "" ]] || \
-		mpc status | grep playing > /dev/null && printf "^c#bf616a^ $current" || printf "^c#bf616a^ $current"
-}
-
-function volume () {
-	echo -n "^c#d08770^墳$(mpc volume | sed 's:.*\:::')"
-}
-function clock () {
-	printf "^c#81a1c1^ $(date +%d.%m.%y) ^c#5e81ac^ $(date +%H:%M)"
+		[[ current = "" ]] && exit || \
+		[[ current = "n/a" ]] && exit || \
+		mpc status | grep playing > /dev/null && echo -n "^c#d08770^墳$volume ^c#bf616a^ $current" || echo -n "^c#d08770^墳$volume ^c#bf616a^ $current"
 	
 }
 
-function ram () {
-	printf "^c#a3be8c^  $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
+clock () {
+	echo -n "^c#81a1c1^ $(date +%d.%m.%y) ^c#5e81ac^ $(date +%H:%M)"
+	
 }
 
-function cpu () {
-	printf "^c#ebcb8b^  $(grep -o "^[^ ]*" /proc/loadavg)"
+ram () {
+	echo -n "^c#a3be8c^  $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
 }
 
+cpu () {
+	echo -n "^c#ebcb8b^  $(grep -o "^[^ ]*" /proc/loadavg)"
+}
 
+export -f music 
 
-function update () {
-	[ -f /usr/bin/mpc ] && xsetroot -name " $(cpu) $(ram) $(volume) $(music) $(clock) " \
-		|| xsetroot -name " $(cpu) $(ram) $(volume) $(clock) " 
+update () {
 
+	dwm -s " $(cpu) $(ram) $(mpc status > /dev/null && music) $(clock) "
 }
 
 export -f update
-
 
 while true; do
 	sleep 1 && update
