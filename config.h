@@ -81,6 +81,7 @@ static const Layout layouts[] = {
 	{ "  ",      zen },
 	{ "缾 ",      NULL },    /* no layout function means floating behavior */
 	{ NULL,       NULL },
+	{ "  ",      monocle },
 };
 
 /* key definitions */
