@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 signal() {
-	xsetroot -name "fsignal:$*"
+	dwm -s "fsignal:$*"
 }
 
 case $# in
