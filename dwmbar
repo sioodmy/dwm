@@ -39,35 +39,48 @@ music () {
 }
 
 battery () {
-    for bat in /tmp/root/sys/class/power_supply/BAT?; do
+	batstatus=""
+	for bat in /sys/class/power_supply/BAT?; do
 
         cap="$(<$bat/capacity)"
         stat="$(<$bat/status)"
 		
 		i=""
+		c="#a3bc8c"
+
 		if [ "$stat" = "Charging" ]; then
 			i=""
 		elif [ "$cap" -le 14 ]; then
 			i=""
+			c="#bf616a"
 		elif [ "$cap" -le 24 ]; then
 			i=""
+			c="#bf616a"
 		elif [ "$cap" -le 34 ]; then
 			i=""
 		elif [ "$cap" -le 44 ]; then
 			i=""
+			c="#d08770"
 		elif [ "$cap" -le 54 ]; then
 			i=""
+			c="#ebcb8b"
 		elif [ "$cap" -le 64 ]; then
 			i=""
+			c="#ebcb8b"
 		elif [ "$cap" -le 74 ]; then
 			i=""
+			c="#a3bc8c"
 		elif [ "$cap" -le 84 ]; then
 			i=""
+			c="#a3bc8c"
 		elif [ "$cap" -le 94 ]; then
+			c="#a3bc8c"
 			i=""
 		fi
-        printf "%s\n" "battery^c#B48EAD^${i} ${cap}%"
-    done
+		batstatus="${batstatus} ^c${c}^${i} ${cap}%"
+	done
+
+        printf "%s\n" "battery${batstatus}"
 }
 
 # loops
@@ -105,8 +118,11 @@ while read -r line; do
 		mpdvol*)
 			mpdvol="${line:6}"
 			;;
+		battery*)
+			battery="${line:7}"
+			;;
 esac
-	dwm -s " ${cpu} ${mem} ${volume} ${music} ${mpdvol} ${date} ${clock} "
+	dwm -s " ${cpu} ${mem} ${volume} ${music} ${mpdvol} ${battery} ${date} ${clock} "
 done < "$pipe"
 
 
