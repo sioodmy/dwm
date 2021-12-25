@@ -1,43 +1,112 @@
 #!/bin/bash
 
-music () {
-	
-	volume=$(mpc volume | sed 's:.*\:::') || exit
-	echo $volume | grep n/a > /dev/null && exit
+pipe=/tmp/barcontent
 
-	current=$(mpc current) && \
-		[[ current = "" ]] && exit || \
-		[[ current = "n/a" ]] && exit || \
-		mpc status | grep playing > /dev/null && echo -n "^c#d08770^墳$volume ^c#bf616a^ $current" || echo -n "^c#d08770^墳$volume ^c#bf616a^ $current"
-	
+if [ ! -p $pipe ]; then
+	    mkfifo $pipe
+fi
+
+trap "rm -f $pipe" EXIT
+
+# modules
+datebar () {
+	printf "%s\n" "date^c#81a1c1^ $(date +%d.%m.%y)"
 }
-
 clock () {
-	echo -n "^c#81a1c1^ $(date +%d.%m.%y) ^c#5e81ac^ $(date +%H:%M)"
-	
+	printf "%s\n" "clock^c#5e81ac^ $(date +%H:%M)"
 }
 
-ram () {
-	echo -n "^c#a3be8c^  $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
+mem () {
+	printf "%s\n" "mem^c#ebcb8b^ $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
 }
-
 cpu () {
-	echo -n "^c#ebcb8b^  $(grep -o "^[^ ]*" /proc/loadavg)"
+	printf "%s\n" "cpu^c#a3be8c^ $(grep -o "^[^ ]*" /proc/loadavg)"
 }
 
-export -f music 
-
-update () {
-
-	dwm -s " $(cpu) $(ram) $(mpc status > /dev/null && music) $(clock) "
+volume () {
+	printf "%s\n" "volume^c#D08770^墳 $(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}')"
 }
 
-export -f update
+mpd_volume () {
+	mpd_volume="$(mpc volume | awk '{ print $2 }')"
+	[ "$mpd_volume" = "n/a" ] || \
+	printf "%s\n" "mpdvol^c#bf616a^| ${mpd_volume}"
+}
 
-while true; do
-	sleep 1 && update
-done &
+music () {
+	mpc status | grep -q "paused" && status="" || status=""	
+	printf "%s\n" "music^c#bf616a^${status} $(mpc current)"
+}
 
-while true; do
-	mpc idle && update
-done &
+battery () {
+    for bat in /tmp/root/sys/class/power_supply/BAT?; do
+
+        cap="$(<$bat/capacity)"
+        stat="$(<$bat/status)"
+		
+		i=""
+		if [ "$stat" = "Charging" ]; then
+			i=""
+		elif [ "$cap" -le 14 ]; then
+			i=""
+		elif [ "$cap" -le 24 ]; then
+			i=""
+		elif [ "$cap" -le 34 ]; then
+			i=""
+		elif [ "$cap" -le 44 ]; then
+			i=""
+		elif [ "$cap" -le 54 ]; then
+			i=""
+		elif [ "$cap" -le 64 ]; then
+			i=""
+		elif [ "$cap" -le 74 ]; then
+			i=""
+		elif [ "$cap" -le 84 ]; then
+			i=""
+		elif [ "$cap" -le 94 ]; then
+			i=""
+		fi
+        printf "%s\n" "battery^c#B48EAD^${i} ${cap}%"
+    done
+}
+
+# loops
+[ -d /sys/class/power_supply/BAT0 ] && \
+while :; do battery; sleep 30s; done > "$pipe" &
+
+while :; do datebar; sleep 1s; done > "$pipe" &
+while :; do clock; sleep 1s; done > "$pipe" &
+while :; do cpu; sleep 30s; done > "$pipe" &
+while :; do mem; sleep 20s; done > "$pipe" &
+while :; do music; mpc idle player; done > "$pipe" &
+while :; do mpd_volume; mpc idle mixer; done > "$pipe" &
+while :; do volume; sleep 0.1s | grep new; done > "$pipe" &
+# make bar
+while read -r line; do
+	case $line in
+		date*)
+			date="${line:4}"
+			;;
+		clock*)
+			clock="${line:5}"
+			;;
+		mem*)
+			mem="${line:3}"
+			;;
+		cpu*)
+			cpu="${line:3}"
+			;;
+		music*)
+			music="${line:5}"
+			;;
+		volume*)
+			volume="${line:6}"
+			;;
+		mpdvol*)
+			mpdvol="${line:6}"
+			;;
+esac
+	dwm -s " ${cpu} ${mem} ${volume} ${music} ${mpdvol} ${date} ${clock} "
+done < "$pipe"
+
+
