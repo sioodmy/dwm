@@ -10,32 +10,36 @@ trap "rm -f $pipe" EXIT
 
 # modules
 datebar () {
-	printf "%s\n" "date^c#81a1c1^ $(date +%d.%m.%y)"
+	printf "%s\n" "date ^c#81a1c1^ $(date +%d.%m.%y)"
 }
 clock () {
-	printf "%s\n" "clock^c#5e81ac^ $(date +%H:%M)"
+	printf "%s\n" "clock ^c#5e81ac^ $(date +%H:%M)"
 }
 
 mem () {
-	printf "%s\n" "mem^c#ebcb8b^ $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
+	printf "%s\n" "mem ^c#ebcb8b^ $(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)"
 }
 cpu () {
-	printf "%s\n" "cpu^c#a3be8c^ $(grep -o "^[^ ]*" /proc/loadavg)"
+	printf "%s\n" "cpu ^c#a3be8c^ $(grep -o "^[^ ]*" /proc/loadavg)"
 }
 
 volume () {
-	printf "%s\n" "volume^c#D08770^墳 $(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}')"
+	printf "%s\n" "volume ^c#D08770^墳 $(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}')"
 }
 
 mpd_volume () {
+	until pgrep mpd; do sleep 2s; done
 	mpd_volume="$(mpc volume | awk '{ print $2 }')"
-	[ "$mpd_volume" = "n/a" ] || \
-	printf "%s\n" "mpdvol^c#bf616a^| ${mpd_volume}"
+	[ "$mpd_volume" = "n/a" ] || 
+#	[ -z "$mpd_volume" ] || 
+	printf "%s\n" "mpdvol ^c#bf616a^| ${mpd_volume}"
 }
 
 music () {
+
+	until pgrep mpd; do sleep 2s; done
 	mpc status | grep -q "paused" && status="" || status=""	
-	printf "%s\n" "music^c#bf616a^${status} $(mpc current)"
+	printf "%s\n" "music ^c#bf616a^${status} $(mpc current)"
 }
 
 battery () {
@@ -80,7 +84,7 @@ battery () {
 		batstatus="${batstatus} ^c${c}^${i} ${cap}%"
 	done
 
-        printf "%s\n" "battery${batstatus}"
+        printf "%s\n" "battery ${batstatus}"
 }
 
 # loops
@@ -122,7 +126,7 @@ while read -r line; do
 			battery="${line:7}"
 			;;
 esac
-	dwm -s " ${cpu} ${mem} ${volume} ${music} ${mpdvol}${battery} ${date} ${clock} "
+		dwm -s " ${cpu}${mem}${volume}${music}${mpdvol}${battery}${date}${clock} "
 done < "$pipe"
 
 
