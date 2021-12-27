@@ -91,13 +91,16 @@ battery () {
 [ -d /sys/class/power_supply/BAT0 ] && \
 while :; do battery; sleep 30s; done > "$pipe" &
 
+pactl get-sink-volume @DEFAULT_SINK@ > /dev/null &&
+	while :; do volume; sleep 0.1s | grep new; done > "$pipe" &
+
 while :; do datebar; sleep 1s; done > "$pipe" &
 while :; do clock; sleep 1s; done > "$pipe" &
 while :; do cpu; sleep 30s; done > "$pipe" &
 while :; do mem; sleep 20s; done > "$pipe" &
 while :; do music; mpc idle player; done > "$pipe" &
 while :; do mpd_volume; mpc idle mixer; done > "$pipe" &
-while :; do volume; sleep 0.1s | grep new; done > "$pipe" &
+
 # make bar
 while read -r line; do
 	case $line in
