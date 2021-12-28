@@ -34,7 +34,7 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = {" ", " ", " ", " ", " "};
+static const char *tags[] = {" ", " ", " ", " ", " "};
 static const char *tagsalt[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 static const int momentaryalttags = 1; /* 1 means alttags will show only when key is held down*/
 static const char *tagsel[][2][2] = {
@@ -57,11 +57,14 @@ static const Rule rules[] = { /* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class     instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
-	{ "Gimp",    NULL,     NULL,           0,         1,          0,           0,        -1 },
-	{ "Firefox", NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
-	{ "st-256color",      NULL,     NULL,           0,         0,          1,           0,        -1 },
-	{ NULL,      NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
+	/* class			instance	title		  tags		 mask	isfloating  isterminal  noswallow  monitor */
+	{ "Gimp",			NULL,     NULL,           0,         1,          0,           0,        -1 },
+	{ "Thunar",			NULL,     NULL,           0,         1,          1,           1,        -1 },
+	{ "Pavucontrol",	NULL,     NULL,           0,         1,          1,           1,        -1 },
+	{ "Firefox",		NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
+	{ "st-256color",    NULL,     NULL,           0,         0,          1,           0,        -1 },
+	{ "Steam",			NULL,	  NULL,			  0,		 0,          1,           0,        -1 },
+	{ NULL,				NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
 
 /* layout(s) */
@@ -82,6 +85,7 @@ static const Layout layouts[] = {
 	{ "  ",      monocle },
 };
 
+#include "selfrestart.c"
 /* key definitions */
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
@@ -134,6 +138,11 @@ toggleviewex(const Arg *arg)
 }
 
 void
+restartdwm(const Arg *arg)
+{
+	self_restart(&((Arg) { .ui = 1 << arg->ui }));
+}
+void
 tagex(const Arg *arg)
 {
 	tag(&((Arg) { .ui = 1 << arg->ui }));
@@ -165,6 +174,69 @@ prevtag(const Arg *arg)
 	shiftviewclients(&((Arg){.i = -1}));
 
 }
+
+void
+ivgaps(const Arg *arg)
+{
+	incrivgaps(&((Arg){.i = +1}));
+
+}
+
+
+void
+togglestickywindow(const Arg *arg)
+{
+	togglesticky(&((Arg){.i = +1}));
+
+}
+void
+ihgaps(const Arg *arg)
+{
+	incrihgaps(&((Arg){.i = +1}));
+
+}
+
+void
+ovgaps(const Arg *arg)
+{
+	incrovgaps(&((Arg){.i = +1}));
+
+}
+
+void
+ohgaps(const Arg *arg)
+{
+	incrohgaps(&((Arg){.i = +1}));
+
+}
+
+void
+igaps(const Arg *arg)
+{
+	incrigaps(&((Arg){.i = +1}));
+
+}
+
+
+void
+iogaps(const Arg *arg)
+{
+	incrogaps(&((Arg){.i = +1}));
+
+}
+
+void
+iggaps(const Arg *arg)
+{
+	incrgaps(&((Arg){.i = +1}));
+
+}
+void
+dgaps(const Arg *arg)
+{
+	defaultgaps(&((Arg){.i = +1}));
+
+}
 /* signal definitions */
 /* signum must be greater than 0 */
 /* trigger signals using `xsetroot -name "fsignal:<signame> [<type> <value>]"` */
@@ -179,8 +251,18 @@ static Signal signals[] = {
 	{ "focusmon",       focusmon },
 	{ "tagmon",         tagmon },
 	{ "zoom",           zoom },
+	{ "defaultgaps",	dgaps },
+	{ "togglesticky",	togglestickywindow },
+	{ "incrigaps",		igaps },
+	{ "incrohgaps",		ohgaps },
+	{ "incrovgaps",		ovgaps },
+	{ "incrihgaps",		ihgaps },
+	{ "incrivgaps",		ivgaps },
+	{ "incrgaps",		iggaps },
+	{ "incogaps",		iogaps },
 	{ "nexttag",	    nexttag },
 	{ "prevtag",		prevtag },
+	{ "selfrestart",	restartdwm },
 	{ "view",           view },
 	{ "viewall",        viewall },
 	{ "viewex",         viewex },
